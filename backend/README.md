@@ -22,3 +22,10 @@ DB_URL="mysql://app_user:app_password@localhost:3306/db_todoapp"
 ```sh
 npm run start
 ```
+
+For testing the frontend a custom route `/test/reset` is necessary to cleanup the DB before each test.
+To active such route, start the backend with:
+
+```sh
+npm run start:e2e
+```
