@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
 
 const UserModel = require('../models').UserModel;
-const JWT_SECRET = require('../config/keys').JWT_SECRET;
+const { JWT_SECRET } = require('../config/keys');
 
 // remove password from user object
 const cleanUser = (user) => {
@@ -13,7 +13,8 @@ const cleanUser = (user) => {
 
 const AuthController = {
   loginUser: async (req, res) => {
-    await UserModel.findOne({
+    const { User } = req.app.locals.models;
+    await User.findOne({
       where: { email: req.body.email.toLowerCase() }
     })
       .then((result) => {

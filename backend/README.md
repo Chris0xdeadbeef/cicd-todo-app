@@ -10,7 +10,8 @@ npm install
 
 ## DB connection
 
-The backend use MySQL database, before starting the Node apllication you need to set a environment variable `DB_URL` to connect to a MySQL server :
+The backend use MySQL database, before starting the Node application you need to set a 
+environment variable `DB_URL` to connect to a MySQL server in a file `.env`:
 
 ```sh
 DB_URL="mysql://app_user:app_password@localhost:3306/db_todoapp"
@@ -20,10 +21,4 @@ DB_URL="mysql://app_user:app_password@localhost:3306/db_todoapp"
 
 ```sh
 npm run start
-```
-
-If you use an _.env_ file in the `backend` folder then run the backend with:
-
-```sh
-npm run start:env
 ```

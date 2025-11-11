@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt');
-const UserModel = require('../models').UserModel;
 
 const cleanUser = (user) => {
   // eslint-disable-next-line no-unused-vars
@@ -10,7 +9,9 @@ const cleanUser = (user) => {
 const UserController = {
   createUser: async (req, res) => {
     const { email, password } = req.body;
-    await UserModel.create({
+    const { User } = req.app.locals.models;
+
+    await User.create({
       email: email.toLowerCase(),
       password: await bcrypt.hash(password, 8)
     })
@@ -19,18 +20,18 @@ const UserController = {
       })
       .catch((error) => {
         console.error('ADD USER: ', error);
+        let errorMsg = "Erreur lors de l'inscription !";
         if (error && error.name === 'SequelizeUniqueConstraintError') {
-          return res.status(409).json({
-            message: 'Un compte avec cet email exist déjà !'
-          });
-        } else {
-          return res.status(500);
+          errorMsg = 'Un compte avec cet email exist déjà !';
         }
+        return res.status(409).json({ message: errorMsg });
       });
   },
   getUser: async (req, res) => {
     const user_id = req.sub;
-    await UserModel.findOne({
+    const { User } = req.app.locals.models;
+
+    await User.findOne({
       where: { id: user_id },
       attributes: { exclude: ['id', 'password'] }
     })
@@ -50,7 +51,9 @@ const UserController = {
     const user_id = req.sub;
     const query = { id: user_id };
     const data = req.body;
-    const user = await UserModel.findOne({ where: query });
+    const { User } = req.app.locals.models;
+
+    const user = await User.findOne({ where: query });
     if (user) {
       user.name = data.name ? data.name : null;
       user.address = data.address ? data.address : null;
@@ -72,7 +75,9 @@ const UserController = {
   deleteCurrentUser: (req, res) => {
     const user_id = req.sub;
     const query = { id: user_id };
-    UserModel.destroy({
+    const { User } = req.app.locals.models;
+
+    User.destroy({
       where: query
     })
       .then(() => {

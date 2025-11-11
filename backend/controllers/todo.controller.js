@@ -1,12 +1,12 @@
 const { Sequelize } = require('sequelize');
 
-const TodoModel = require('../models').TodoModel;
-
 const TodoController = {
   createTodo: async (req, res) => {
     const user_id = req.sub;
     const { text, date } = req.body;
-    await TodoModel.create({
+    const { Todo } = req.app.locals.models;
+
+    await Todo.create({
       text: text,
       date: date,
       completed: false,
@@ -22,7 +22,9 @@ const TodoController = {
   },
   getAllTodo: async (req, res) => {
     const user_id = req.sub;
-    await TodoModel.findAll({
+    const { Todo } = req.app.locals.models;
+
+    await Todo.findAll({
       where: { user_id: user_id },
       order: [['date', 'ASC']],
       attributes: { exclude: ['user_id'] }
@@ -43,7 +45,9 @@ const TodoController = {
     const user_id = req.sub;
     const query = { id: req.params.id, user_id: user_id };
     const data = req.body;
-    const result = await TodoModel.findOne({ where: query });
+    const { Todo } = req.app.locals.models;
+
+    const result = await Todo.findOne({ where: query });
     if (result) {
       result.completed = data.completed ? data.completed : false;
       result.text = data.text ? data.text : result.text;
@@ -65,7 +69,9 @@ const TodoController = {
     const user_id = req.sub;
     const todo_id = req.params.id;
     const query = { id: todo_id, user_id: user_id };
-    TodoModel.destroy({
+    const { Todo } = req.app.locals.models;
+
+    Todo.destroy({
       where: query
     })
       .then(() => {
@@ -79,7 +85,9 @@ const TodoController = {
   getSearchTodo: async (req, res) => {
     const user_id = req.sub;
     const query = req.query.q;
-    await TodoModel.findAll({
+    const { Todo } = req.app.locals.models;
+
+    await Todo.findAll({
       where: [
         {
           user_id: user_id
