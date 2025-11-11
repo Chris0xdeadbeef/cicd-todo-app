@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 /// <reference types="cypress" />
 // ***********************************************
 // This example commands.ts shows you how to
@@ -25,15 +26,42 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
 
-export {}
+Cypress.Commands.add("resetDb", () => {
+  // send request to reset the database
+  cy.request("POST", `${Cypress.env('BACKEND_URL') as string}/test/reset`);
+});
+
+Cypress.Commands.add("createUser", (email: string, password: string) => {
+  // send create user request
+  cy.request("POST", `${Cypress.env('BACKEND_URL') as string}/api/user/`, {
+    email,
+    password,
+  });
+});
+
+Cypress.Commands.add('login', (email: string, password: string) => {
+  // send login request
+  cy.request('POST', `${Cypress.env('BACKEND_URL') as string}/api/auth`, {
+    email,
+    password,
+  }).then((response) => {
+    // save JWT token to local storage
+    window.localStorage.setItem('token', response.body.token);
+  });
+});
+
+  
+// Augment Cypress types to include our custom commands so their string names are accepted.
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      resetDb(): Chainable;
+      createUser(email: string, password: string): Chainable;
+      login(email: string, password: string): Chainable;
+    }
+  }
+}
+
+export {};
+

@@ -1,31 +1,36 @@
-import { fileURLToPath, URL } from 'node:url'
+// vite.config.ts
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import tailwindcss from "@tailwindcss/vite";
-// import { visualizer } from 'rollup-plugin-visualizer'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+//import svgLoader from 'vite-svg-loader'
+import { fileURLToPath, URL } from 'node:url'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
-    tailwindcss(),
-    // visualizer({ open: true })
+    vueJsx(),
+    //svgLoader(),
   ],
   resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+  },
+  build: {
+    sourcemap: true,
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler',
+      },
+    },
   },
   server: {
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:3000',
+        target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
-      }
-    }
+      },
+    },
   },
-  build: {
-    sourcemap: true
-  }
 })

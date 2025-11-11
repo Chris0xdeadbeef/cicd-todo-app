@@ -25,9 +25,16 @@ export const useTodo = defineStore('todo', {
     async createTodo(todoForm: TodoForm) {
       await createTodo(todoForm).then((response: ResponseData) => {
         const todoResponse = response as unknown as ResponseTodoData;
+        // normalize response to Todo (convert date string to Date)
+        const todo: Todo = {
+          id: todoResponse.id,
+          date: new Date(todoResponse.date),
+          text: todoResponse.text,
+          completed: todoResponse.completed
+        };
         // ajoute le todo dans le tableau
         if (this.allTodo) {
-          this.allTodo.push(todoResponse);
+          this.allTodo.push(todo);
           this.allTodo = this.allTodo.sort(
             (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
           );
@@ -40,7 +47,15 @@ export const useTodo = defineStore('todo', {
         if (this.allTodo) {
           // mets à jour le todo dans le tableau
           this.allTodo = this.allTodo.map((todo) =>
-            todo.id === todoResponse.id ? { ...todo, ...todoResponse } : todo
+            todo.id === todoResponse.id
+              ? {
+                  ...todo,
+                  id: todoResponse.id,
+                  date: new Date(todoResponse.date),
+                  text: todoResponse.text,
+                  completed: todoResponse.completed
+                }
+              : todo
           );
         }
       });

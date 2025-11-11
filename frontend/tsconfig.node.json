@@ -8,9 +8,9 @@
     "playwright.config.*"
   ],
   "compilerOptions": {
-    "composite": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "types": ["node"]
+    "target": "ES2022",
+    "moduleResolution": "NodeNext",
+    "types": ["cypress", "node"],
+    "strict": true
   }
 }
