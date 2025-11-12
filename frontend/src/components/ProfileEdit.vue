@@ -7,10 +7,12 @@ import router from '@/router';
 import type { User } from '@/shared/interfaces';
 import { useUser } from '@/shared/stores';
 import FormInput from '@/components/forms/FormInput.vue';
+import ConfirmationDialog from '@/components/modals/ConfirmationDialog.vue';
 
 const userStore = useUser();
 const { currentUser } = userStore;
 const loading = ref(false);
+const showDialog = ref(false);
 
 const schema = Yup.object().shape({
   name: Yup.string().required('Vous devez renseigner ce champ')
@@ -24,18 +26,21 @@ const onSubmit = async (formData: Record<string, any>) => {
       loading.value = false;
     });
   } catch (e) {
-    console.log(e);
+    console.error(e);
     loading.value = false;
   }
 };
 
-const onDelete = async () => {
-  try {
-    await userStore.deleteUser().then(() => {
-      router.push('/register');
+const onDelete = () => {
+  showDialog.value = true;
+};
+
+const confirmDelete = (value: boolean) => {
+  showDialog.value = false;
+  if (value) {
+    userStore.deleteUser().then(() => {
+      router.push('/');
     });
-  } catch (e) {
-    console.log(e);
   }
 };
 
@@ -93,6 +98,7 @@ const location = computed(() => currentUser?.location);
           </p>
         </div>
       </Form>
+      <ConfirmationDialog :show="showDialog" @result="confirmDelete" />
     </div>
   </div>
 </template>
