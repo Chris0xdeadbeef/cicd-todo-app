@@ -44,10 +44,18 @@ Cypress.Commands.add('login', (email: string, password: string) => {
   cy.session(
     email,
     () => {
+      // Intercept API calls related to todos to ensure they complete before proceeding
+      cy.intercept('GET', '/api/todo').as('getTodos');
+
       cy.visit('/login');
       cy.get('input[name=email]').type(email);
       cy.get('input[name=password]').type(`${password}{enter}`, { log: false });
+
+      // Attend le chargement initial des todos
+      cy.wait('@getTodos');
+      
       cy.url().should('include', '/');
+      cy.get('h2').contains('Nouvelle tâche').should('exist');
     },
     {
       validate: () => {
@@ -59,6 +67,17 @@ Cypress.Commands.add('login', (email: string, password: string) => {
   )
 });
 
+Cypress.Commands.add('todo', (todoText: string) => {
+  // Ajoute une nouvelle tâche
+  cy.get('[id="date"]').click();
+  cy.get('.dp__calendar').find('.dp__cell_inner').contains('25').click();
+  cy.get('[id="date"]').invoke('val').should('match', /^\d{2}\/\d{2}\/\d{4}$/);
+  cy.get('[id="new-todo-input"] > div').clear();
+  cy.get('[id="new-todo-input"] > div').type(todoText);
+  cy.get('[data-testid="new-todo-submit-btn"]').click();
+  cy.get('[data-testid="todo-list"]').should('contain', todoText);
+});
+
 
   
 // Augment Cypress types to include our custom commands so their string names are accepted.
@@ -68,6 +87,7 @@ declare global {
       resetDb(): Chainable;
       createUser(email: string, password: string): Chainable;
       login(email: string, password: string): Chainable;
+      todo(todoText: string): Chainable;
     }
   }
 }

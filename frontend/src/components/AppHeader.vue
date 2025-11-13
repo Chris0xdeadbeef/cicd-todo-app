@@ -79,7 +79,8 @@ const imgUrlProfile = new URL('../assets/funny-smile.png', import.meta.url).href
             <div>
               <MenuButton
                 class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-              >
+                data-testid="menu-button"
+                >
                 <span class="absolute -inset-1.5"></span>
                 <span class="sr-only">Ouvrir le menu</span>
                 <img class="h-8 w-8 rounded-full" :src="imgUrlProfile" alt="Profile" />
@@ -100,6 +101,7 @@ const imgUrlProfile = new URL('../assets/funny-smile.png', import.meta.url).href
                   <a
                     href="/profile"
                     :class="[active ? 'bg-gray-100' : '', 'flex px-4 py-2 text-sm text-gray-700']"
+                    data-testid="menu-profile"
                   >
                     <UserIcon class="h-5 w-5" />
                     Mon Profile</a
@@ -110,6 +112,7 @@ const imgUrlProfile = new URL('../assets/funny-smile.png', import.meta.url).href
                     href="#"
                     @click="logout"
                     :class="[active ? 'bg-gray-100' : '', 'flex px-4 py-2 text-sm text-gray-700']"
+                    data-testid="menu-logout"
                   >
                     <ArrowRightStartOnRectangleIcon class="h-5 w-5" />
                     Déconnexion</a

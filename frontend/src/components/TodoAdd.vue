@@ -63,10 +63,12 @@ const onSubmit = async () => {
             :error="errorDate"
             placeholder="jj/mm/aaaa"
             class="mb-4"
+            data-testid="todo-date"
           />
           <FormEditor 
             v-model="text" 
-            :error="errorText" 
+            :error="errorText"
+            idName="new-todo-input"
             placeholder="Description ..." 
             class="mb-4"
           />
@@ -74,7 +76,8 @@ const onSubmit = async () => {
             type="submit"
             :disabled="loading"
             class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-md px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-          >
+            data-testid="new-todo-submit-btn"
+            >
             <AppSpinner v-if="loading" class="mx-auto h-6 w-6" />
             <span v-else>Ajouter la tâche</span>
           </button>

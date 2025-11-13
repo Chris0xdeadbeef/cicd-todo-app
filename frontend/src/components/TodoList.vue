@@ -74,6 +74,7 @@ const clearSearchTodo = async () => {
               type="text"
               placeholder="Rechercher ..."
               class="w-full border text-md rounded-lg pl-8 pr-2.5 py-2 block bg-gray-50 border-gray-300 text-gray-900 focus:ring-blue-700 focus:border-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-700 dark:focus:border-blue-700"
+              data-testid="search-input"
             />
             <button
               type="button"
@@ -108,13 +109,14 @@ const clearSearchTodo = async () => {
         <AppSpinner class="w-8 h-8"/>
       </template>
       <template v-else>
-        <ul role="list" class="mt-2 flex flex-col list-none">
+        <ul role="list" class="mt-2 flex flex-col list-none" data-testid="todo-list">
           <li v-for="todo in allTodo" :key="todo.id">
             <TodoItem
               :todoId="Number(todo.id)"
               :todoDate="todo.date.toString()"
               :todoCompleted="todo.completed"
               :todoText="todo.text"
+              data-testid="todo-item"
             />
           </li>
           <li

@@ -94,6 +94,7 @@ const todoCompletedLocal = computed({
             label:
               'text-gray-600 dark:text-gray-700 text-center font-bold w-8 border-box whitespace-nowrap select-none pl-1 pr-1 ml-[8px] mr-[15px]'
           }"
+          data-testid="todo-toggle"
         >
           <template v-slot:label="{ checked, classList }">
             <div :class="classList.label">{{ checked ? 'Done' : 'To Do' }}</div>
@@ -101,19 +102,11 @@ const todoCompletedLocal = computed({
         </Toggle>
       </div>
       <div class="ml-4 flex-shrink-0">
-        <TrashIcon
-          data-tooltip-target="tooltip-default"
-          class="h-5 w-5 stroke-gray-600 dark:stroke-white hover:stroke-black cursor-pointer"
-          @click="deleteTodoItem(todoId)"
-        />
-        <div
-          id="tooltip-default"
-          role="tooltip"
-          class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
-        >
-          Supprimer
-          <div class="tooltip-arrow" data-popper-arrow></div>
-        </div>
+        <button data-testid="delete-todo" @click="deleteTodoItem(todoId)">
+          <TrashIcon
+            class="h-5 w-5 stroke-gray-600 dark:stroke-white hover:stroke-red-500 cursor-pointer"
+          />
+        </button>
       </div>
     </div>
     <div

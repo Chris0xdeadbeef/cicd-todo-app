@@ -24,6 +24,10 @@ const props = defineProps({
   error: {
     type: Boolean,
     default: false
+  },
+  idName: {
+    type: String,
+    default: ''
   }
 });
 
@@ -249,7 +253,7 @@ const editor = useEditor({
           </svg>
         </button>
       </div>
-      <EditorContent :editor="editor" />
+      <EditorContent :editor="editor" :id="idName" />
     </div>
   </div>
 </template>
