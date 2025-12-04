@@ -10,4 +10,5 @@ function initModels(sequelize) {
   return { User, Todo };
 }
 
-module.exports = { initModels };
+module.exports = { initModels }; // exporter user et todo
+
