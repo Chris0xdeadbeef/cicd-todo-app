@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser');
 // Load env vars
 process.loadEnvFile('./.env');
 
-const { sequelize: db } = require('./config/database');
+const { connectDB, mongoose: db } = require('./config/database');
 const { initModels } = require('./models');
 const router = require('./routes');
 
@@ -54,7 +54,7 @@ async function initApp(options = {}) {
 
   const theApp = createApp();
 
-  await db.authenticate();
+  await connectDB();
 
   // Initialize all models & expose to controllers
   const models = initModels(db);
