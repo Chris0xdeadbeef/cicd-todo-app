@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
-const TodoSchema = new mongoose.Schema(
-  {
+const todoSchema = new mongoose.Schema({
     text: {
       type: String,
       required: true
@@ -19,12 +18,11 @@ const TodoSchema = new mongoose.Schema(
       ref: "User",
       required: true
     }
-  },  
-  {
-    indexes: []
-  }
-);
-//index text en MongoDB, équivalent FULLTEXT (MySQL)
-TodoSchema.index({text: "text"})
+});
 
-module.exports = mongoose.model("Todo", TodoSchema)
+//index text en MongoDB, équivalent FULLTEXT (MySQL)
+todoSchema.index({text: "text"});
+
+const Todo = mongoose.model("Todo", todoSchema);
+
+module.exports = Todo;
