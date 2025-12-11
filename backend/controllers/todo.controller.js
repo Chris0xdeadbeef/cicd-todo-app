@@ -1,3 +1,19 @@
+const cleanTodo = (todo) => {
+  // Convert Mongoose document to plain object if needed
+  const obj = todo.toObject ? todo.toObject() : { ...todo };
+
+  // Replace _id with id as string
+  obj.id = obj._id.toString();
+  delete obj._id;
+
+  // Convert user_id to string
+  if (obj.user_id && typeof obj.user_id.toString === 'function') {
+    obj.user_id = obj.user_id.toString();
+  }
+
+  return obj;
+};
+
 const TodoController = {
   createTodo: async (req, res) => {
     try {
@@ -23,9 +39,9 @@ const TodoController = {
       const user_id = req.sub;
       const { Todo } = req.app.locals.models;
 
-      const todos = await Todo.find({ user_id }).sort({ date: 1 }).select('-user_id');
-
-      if (todos.length > 0) return res.status(200).json(todos);
+      const todos = await Todo.find({ user_id }).sort({ date: 1 }).select('-user_id -__v');
+      console.log("todos", todos.map(t => cleanTodo(t)));
+      if (todos) return res.status(200).json(todos.map(t => cleanTodo(t)));
       else return res.sendStatus(404);
     } catch (error) {
       console.error('GET ALL TODO: ', error);
