@@ -48,4 +48,5 @@ Rôle dédié au backup :
 
 ## Chapitre explicatif de l’usage fait de l’IA dans ce projet 
 L’IA a été utilisée comme outil d’aide rédactionnelle et de soutien conceptuel pour clarifier et structurer certaines portions du README et du cahier des charges.
+
 ## Conclusion
