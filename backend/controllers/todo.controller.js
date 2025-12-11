@@ -75,7 +75,6 @@ const TodoController = {
       const query = req.query.q;
       const { Todo } = req.app.locals.models;
 
-      // Assure-toi que tu as un index text sur le champ text dans le modèle Todo
       const todos = await Todo.find({
         user_id,
         $text: { $search: query }
