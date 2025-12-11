@@ -47,6 +47,6 @@ Rôle dédié au backup :
 ## Indications demandées permettant le backup de la base de données de l’application « point 2.2 » 
 
 ## Chapitre explicatif de l’usage fait de l’IA dans ce projet 
-L’IA a été utilisée comme outil d’aide rédactionnelle et de soutien conceptuel pour clarifier et structurer certaines portions du README et du cahier des charges.
+L’IA a été utilisée comme outil d’aide rédactionnelle et de soutien conceptuel pour clarifier et structurer certaines portions du README et du cahier des charges, ainsi qu'à la conversion mongoose.
 
 ## Conclusion
