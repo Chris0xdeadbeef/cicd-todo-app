@@ -1,29 +1,39 @@
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('user', {
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true
+  const isSqlite = sequelize.getDialect() === 'sqlite';
+
+  const Todo = sequelize.define(
+    'todo',
+    {
+      text: {
+        // In SQLite, TEXT is already 'long' by default (for the tests)
+        type: isSqlite ? DataTypes.TEXT : DataTypes.TEXT('long'),
+        allowNull: false
+      },
+      date: {
+        type: DataTypes.DATEONLY,
+        allowNull: true
+      },
+      completed: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false
+      },
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id'
+        },
+        onDelete: 'CASCADE'
       }
     },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    name: {
-      type: DataTypes.STRING
-    },
-    address: {
-      type: DataTypes.STRING
-    },
-    zip: {
-      type: DataTypes.INTEGER
-    },
-    location: {
-      type: DataTypes.STRING
+    {
+      indexes: [
+        // FULLTEXT only exists in MySQL, so disable on SQLite (for the tests)
+        ...(isSqlite ? [] : [{ type: 'FULLTEXT', name: 'text_idx', fields: ['text'] }])
+      ]
     }
-  });
-  return User;
+  );
+
+  return Todo;
 };
