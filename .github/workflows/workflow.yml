@@ -34,8 +34,6 @@ jobs:
           run: npm run lint
 
         - name: Test CI
-          env: 
-            NODE_ENV: test
           run: npm run test:ci
 
     check_frontend:

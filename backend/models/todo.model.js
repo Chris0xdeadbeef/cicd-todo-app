@@ -1,28 +1,29 @@
-const mongoose = require('mongoose');
-
-const todoSchema = new mongoose.Schema({
-    text: {
-      type: String,
-      required: true
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define('user', {
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true
+      }
     },
-    date: {
-      type: Date,
-      required: false
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
-    completed: {
-      type: Boolean,
-      required: true
+    name: {
+      type: DataTypes.STRING
     },
-    user_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true
+    address: {
+      type: DataTypes.STRING
+    },
+    zip: {
+      type: DataTypes.INTEGER
+    },
+    location: {
+      type: DataTypes.STRING
     }
-});
-
-//index text en MongoDB, équivalent FULLTEXT (MySQL)
-todoSchema.index({text: "text"});
-
-const Todo = mongoose.model("Todo", todoSchema);
-
-module.exports = Todo;
+  });
+  return User;
+};
