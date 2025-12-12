@@ -20,6 +20,9 @@ jobs:
           with:
             node-version: 22
 
+        - name: Install npm
+          run: npm install
+
         - name: Install backend deps
           run: npm ci
 
@@ -45,6 +48,9 @@ jobs:
           uses: actions/setup-node@v6
           with:
             node-version: 22
+
+        - name: Install npm
+          run: npm install
 
         - name: Audit
           run: npm run audit:ci
