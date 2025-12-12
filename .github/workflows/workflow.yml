@@ -110,23 +110,21 @@ jobs:
             wait-on-timeout: 60
             config: baseUrl=http://localhost:4173
 
-    
+    build_frontend:
+      needs: test_e2e
+      runs-on: ubuntu-latest
 
-    # build_frontend:
-    #   needs: test_e2e
-    #   runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
 
-    #   steps:
-    #     - name: Checkout
-    #       uses: actions/checkout@v4
+        - name: Install frontend deps
+          working-directory: frontend
+          run: npm ci
 
-    #     - name: Install frontend deps
-    #       working-directory: frontend
-    #       run: npm ci
-
-    #     - name: Build frontend
-    #       working-directory: frontend
-    #       run: npm run build
+        - name: Build frontend
+          working-directory: frontend
+          run: npm run build
  
 
     # deploy:
