@@ -133,24 +133,45 @@ jobs:
 
         - name: Build frontend
           working-directory: frontend
-          run: npm run build
- 
+          run: npm run build:only
 
-    # deploy:
-    #   needs: test_e2e
-    #   runs-on: ubuntu-latest
-      
-    #   steps:
-    #     - name: Download build artifact
-    #       uses: actions/download-artifact@v4
-    #       with:
-    #         name: ??
-    #         path: ??
+        - name: Create artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: frontend-build
+            path: frontend/dist
 
-    #     - name: SCP upload to server
-    #       run: |
-    #         scp -r ??/* user@your_server:/var/www/your_app/
+    deploy:
+      needs: build_frontend
+      runs-on: ubuntu-latest
 
-    #     - name: SSH restart service
-    #       run: |
-    #         ssh user@your_server "pm2 restart all || systemctl restart yourservice"
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        # 1) Télécharger l'artifact créé dans le build
+        - name: Download build artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: frontend-build
+            path: frontend/dist
+
+        # 2) Setup VPN via action locale
+        - name: VPN setup
+          uses: ./.github/actions/vpn
+          with:
+            host: vpn-labetml.protocloud.ch
+            port: 443
+            username: etml-student
+            password: ${{ secrets.VPN_PASSWORD }}
+            ping_host: ${{ secrets.TEST_HOST_IP }}
+
+        # 3) Envoyer les fichiers vers le serveur de test via SCP
+        - name: SCP upload to test server
+          run: |
+            scp -o StrictHostKeyChecking=no -r frontend/dist/* admin@172.26.1.21:/var/www/your_app/
+
+        # 4) Redémarrer le service sur le serveur de test
+        - name: SSH restart service on test server
+          run: |
+            ssh -o StrictHostKeyChecking=no admin@172.26.1.21 "pm2 restart all || systemctl restart yourservice"
