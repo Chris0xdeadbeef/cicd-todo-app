@@ -144,7 +144,6 @@ jobs:
     deploy:
       needs: build_frontend
       runs-on: ubuntu-latest
-
       steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -160,18 +159,29 @@ jobs:
         - name: VPN setup
           uses: ./.github/actions/vpn
           with:
-            host: ${{ secrets.HOST }}
-            port: ${{ secrets.PORT }}
-            username: ${{ secrets.USERNAME }}
+            host: ${{ secrets.VPN_HOST }}
+            port: ${{ secrets.VPN_PORT }}
+            username: ${{ secrets.VPN_USERNAME }}
             password: ${{ secrets.VPN_PASSWORD }}
-            ping_host: ${{ secrets.TEST_HOST_IP }}
+            ping_host: ${{ secrets.TEST_SSH_HOST }}
 
-        # 3) Envoyer les fichiers vers le serveur de test via SCP
-        - name: SCP upload
-          run: |
-            scp -o StrictHostKeyChecking=no -r frontend/dist/* ${{ secrets.TEST_USERNAME }}@${{ secrets.TEST_HOST_IP }}:/var/www/your_app/
+        # 3) Envoyer les fichiers vers le serveur de test via SCP - appleboy/scp-action
+        - name: Copy files via SSH
+          uses: appleboy/scp-action@v1
+          with:
+            host: ${{ secrets.TEST_SSH_HOST }}
+            username: ${{ secrets.TEST_SSH_USERNAME }}
+            password: ${{ secrets.TEST_SSH_PASSWORD }}
+            port: ${{ secrets.TEST_SSH_PORT }}
+            source: "frontend/dist"
+            target: "/app"
 
-        # 4) Redémarrer le service sur le serveur de test
-        - name: SSH restart service
-          run: |
-            ssh ${{ secrets.TEST_USERNAME }}@${{ secrets.TEST_HOST_IP }}
+        # 4) Se connecter sur SSH utiliser appleboy/ssh-action
+        - name: Execute remote SSH commands
+          uses: appleboy/ssh-action@v1
+          with:
+            host: ${{ secrets.TEST_SSH_HOST }}
+            username: ${{ secrets.TEST_SSH_USERNAME }}
+            password: ${{ secrets.TEST_SSH_PASSWORD }}
+            port: ${{ secrets.TEST_SSH_PORT }}
+            script: 
