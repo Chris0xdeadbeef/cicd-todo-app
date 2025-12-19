@@ -156,32 +156,22 @@ jobs:
             name: frontend-build
             path: frontend/dist
 
-        # 2) Setup VPN non interactif
-        - name: Connect to VPN
-          run: |
-            echo "${{ secrets.VPN_PASSWORD }}" | sudo openconnect \
-              --user=etml-student \
-              --passwd-on-stdin \
-              --servercert sha256:<SERVER_CERT_HASH> \
-              --no-dtls \
-              vpn-labetml.protocloud.ch &            
-            echo "Waiting for VPN..."
-            for i in {1..10}; do
-              if ping -c 1 ${{ secrets.TEST_HOST_IP }} >/dev/null 2>&1; then
-                echo "VPN is up!"
-                break
-              fi
-              echo "Still waiting..."
-              sleep 2
-            done
+        # 2) Setup VPN via action locale
+        - name: VPN setup
+          uses: ./.github/actions/vpn
+          with:
+            host: ${{ secrets.HOST }}
+            port: ${{ secrets.PORT }}
+            username: ${{ secrets.USERNAME }}
+            password: ${{ secrets.VPN_PASSWORD }}
+            ping_host: ${{ secrets.TEST_HOST_IP }}
 
         # 3) Envoyer les fichiers vers le serveur de test via SCP
-        - name: SCP upload to test server
+        - name: SCP upload
           run: |
-            scp -o StrictHostKeyChecking=no -r frontend/dist/* admin@172.26.1.21:/var/www/your_app/
+            scp -o StrictHostKeyChecking=no -r frontend/dist/* ${{ secrets.TEST_USERNAME }}@${{ secrets.TEST_HOST_IP }}:/var/www/your_app/
 
         # 4) Redémarrer le service sur le serveur de test
-        - name: SSH restart service on test server
+        - name: SSH restart service
           run: |
-            ssh -o StrictHostKeyChecking=no admin@172.26.1.21 "pm2 restart all || systemctl restart yourservice"
-
+            ssh ${{ secrets.TEST_USERNAME }}@${{ secrets.TEST_HOST_IP }}
