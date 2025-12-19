@@ -152,6 +152,11 @@ jobs:
             path: frontend/dist
         
         # 2) Prépare backend depencies
+        - name: Install NodeJS
+          uses: actions/setup-node@v6
+          with:
+            node-version: 24
+
         - name: Install backend deps
           working-directory: backend
           run: npm ci
