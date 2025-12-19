@@ -127,10 +127,6 @@ jobs:
           working-directory: frontend
           run: npm ci
 
-        - name: Install cross-env
-          working-directory: frontend
-          run: npm install --no-save cross-env
-
         - name: Build frontend
           working-directory: frontend
           run: npm run build:only
@@ -154,6 +150,11 @@ jobs:
           with:
             name: frontend-build
             path: frontend/dist
+        
+        # 2) Prépare backend depencies
+        - name: Install backend deps
+          working-directory: backend
+          run: npm ci
 
         # 2) Setup VPN via action locale
         - name: VPN setup
@@ -173,8 +174,8 @@ jobs:
             username: ${{ secrets.TEST_SSH_USERNAME }}
             password: ${{ secrets.TEST_SSH_PASSWORD }}
             port: ${{ secrets.TEST_SSH_PORT }}
-            source: "frontend/dist"
-            target: "/app"
+            source: "./frontend/dist, ./backend, docker-compose.yml"
+            target: ~/app
 
         # 4) Se connecter sur SSH utiliser appleboy/ssh-action
         - name: Execute remote SSH commands
@@ -184,4 +185,14 @@ jobs:
             username: ${{ secrets.TEST_SSH_USERNAME }}
             password: ${{ secrets.TEST_SSH_PASSWORD }}
             port: ${{ secrets.TEST_SSH_PORT }}
-            script: 
+            script: |
+              cd ~/app
+              echo 'DB_URL="mysql://app_user:app_password@localhost:3306/db_todoapp"' > backend/.env
+              docker-compose up -d
+              cd backend
+              npm ci
+              npm run start:prod
+              cd ../frontend/dist
+              pm2 serve . --name todo-frontend --spa
+
+
