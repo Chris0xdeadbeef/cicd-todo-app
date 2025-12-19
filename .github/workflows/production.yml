@@ -1,0 +1,98 @@
+name: CI/CD production
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_frontend:
+      needs: production_e2e
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Install NodeJS
+          uses: actions/setup-node@v6
+          with:
+            node-version: 24
+
+        - name: Install frontend deps
+          working-directory: frontend
+          run: npm ci
+
+        - name: Build frontend
+          working-directory: frontend
+          run: npm run build:only
+
+        - name: Create artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: frontend-build
+            path: frontend/dist
+
+    deploy:
+      needs: build_frontend
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        # 1) Télécharger l'artifact créé dans le build
+        - name: Download build artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: frontend-build
+            path: frontend/dist
+        
+        # 2) Prépare backend depencies
+        - name: Install NodeJS
+          uses: actions/setup-node@v6
+          with:
+            node-version: 24
+
+        - name: Install backend deps
+          working-directory: backend
+          run: npm ci
+
+        # 2) Setup VPN via action locale
+        - name: VPN setup
+          uses: ./.github/actions/vpn
+          with:
+            host: ${{ secrets.VPN_HOST }}
+            port: ${{ secrets.VPN_PORT }}
+            username: ${{ secrets.VPN_USERNAME }}
+            password: ${{ secrets.VPN_PASSWORD }}
+            ping_host: ${{ secrets.TEST_SSH_HOST }}
+
+        # 3) Envoyer les fichiers vers le serveur de test via SCP - appleboy/scp-action
+        - name: Copy files via SSH
+          uses: appleboy/scp-action@v1
+          with:
+            host: ${{ secrets.TEST_SSH_HOST }}
+            username: ${{ secrets.TEST_SSH_USERNAME }}
+            password: ${{ secrets.TEST_SSH_PASSWORD }}
+            port: ${{ secrets.TEST_SSH_PORT }}
+            source: "./frontend/dist, ./backend, docker-compose.yml"
+            target: ~/app
+
+        # 4) Se connecter sur SSH utiliser appleboy/ssh-action
+        - name: Execute remote SSH commands
+          uses: appleboy/ssh-action@v1
+          with:
+            host: ${{ secrets.TEST_SSH_HOST }}
+            username: ${{ secrets.TEST_SSH_USERNAME }}
+            password: ${{ secrets.TEST_SSH_PASSWORD }}
+            port: ${{ secrets.TEST_SSH_PORT }}
+            script: |
+              cd ~/app
+              cd backend && echo 'DB_URL="${{ secrets.DB_URL }}"' > .env
+              docker-compose up -d
+              cd backend && npm run start:prod && pm2 save
+
+
