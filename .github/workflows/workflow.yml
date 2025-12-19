@@ -192,7 +192,7 @@ jobs:
             port: ${{ secrets.TEST_SSH_PORT }}
             script: |
               cd ~/app
-              echo 'DB_URL="mysql://app_user:app_password@localhost:3306/db_todoapp"' > backend/.env
+              echo 'DB_URL="${{ secrets.DB_URL }}"' > backend/.env
               docker-compose up -d
               cd backend
               npm ci
