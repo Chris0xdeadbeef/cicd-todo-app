@@ -127,6 +127,10 @@ jobs:
           working-directory: frontend
           run: npm ci
 
+        - name: Install cross-env
+          working-directory: frontend
+          run: npm install --no-save cross-env
+
         - name: Build frontend
           working-directory: frontend
           run: npm run build
