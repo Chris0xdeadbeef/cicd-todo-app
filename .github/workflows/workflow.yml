@@ -192,12 +192,8 @@ jobs:
             port: ${{ secrets.TEST_SSH_PORT }}
             script: |
               cd ~/app
-              echo 'DB_URL="${{ secrets.DB_URL }}"' > backend/.env
+              cd backend && echo 'DB_URL="${{ secrets.DB_URL }}"' > .env
               docker-compose up -d
-              cd backend
-              npm ci
-              npm run start:prod
-              cd ../frontend/dist
-              pm2 serve . --name todo-frontend --spa
+              cd backend && npm run start:prod && pm2 save
 
 
